@@ -59,7 +59,7 @@ if form.getvalue('create'):
             installiso
             ], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
-        message = '<i>Command output from creating VM ' + vmname + ':\n<pre>' + cgi.escape(r) + '</pre></i>'
+        message = '<i>Command output from creating VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
 if form.getvalue('stop'):
@@ -73,7 +73,7 @@ if form.getvalue('stop'):
     if valid:
         p = Popen(['/usr/bin/sudo', '/root/vmcontrol/stopvm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
-        message = '<i>Command output from stopping VM ' + vmname + ' ("destroy" means stop in this case):\n<pre>' + cgi.escape(r) + '</pre></i>'
+        message = '<i>Command output from stopping VM ' + vmname + ' ("destroy" means stop in this case):\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
 if form.getvalue('start'):
@@ -87,11 +87,15 @@ if form.getvalue('start'):
     if valid:
         p = Popen(['/usr/bin/sudo', '/root/vmcontrol/startvm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
-        message = '<i>Command output from starting VM ' + vmname + ':\n<pre>' + cgi.escape(r) + '</pre></i>'
+        message = '<i>Command output from starting VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
 if form.getvalue('delete'):
     valid = True
+
+    deletionconfirmed = form.getvalue('deletionconfirmed')
+    if deletionconfirmed != 'true':
+        valid = False
 
     vmname = form.getvalue('delete')
     if not vmname or re.search('[^\w]', vmname):
@@ -101,7 +105,7 @@ if form.getvalue('delete'):
     if valid:
         p = Popen(['/usr/bin/sudo', '/root/vmcontrol/deletevm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
-        message = '<i>Command output from deleting VM ' + vmname + ':\n<pre>' + cgi.escape(r) + '</pre></i>'
+        message = '<i>Command output from deleting VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
 if form.getvalue('changeiso'):
@@ -122,7 +126,7 @@ if form.getvalue('changeiso'):
     if valid:
         p = Popen(['/usr/bin/sudo', '/root/vmcontrol/mountiso.py', vmname, iso], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
-        message = '<i>Command output from mounting ISO to VM ' + vmname + ':\n<pre>' + cgi.escape(r) + '</pre></i>'
+        message = '<i>Command output from mounting ISO to VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
 if form.getvalue('createdatadisk'):
@@ -141,11 +145,15 @@ if form.getvalue('createdatadisk'):
     if valid:
         p = Popen(['/usr/bin/sudo', '/root/vmcontrol/createdatadisk.py', vmname, datadisksize], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
-        message = '<i>Command output from creating data disk for VM ' + vmname + ':\n<pre>' + cgi.escape(r) + '</pre></i>'
+        message = '<i>Command output from creating data disk for VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
 if form.getvalue('deletedatadisk'):
     valid = True
+
+    deletionconfirmed = form.getvalue('deletionconfirmed')
+    if deletionconfirmed != 'true':
+        valid = False
 
     vmname, datadiskfilename = form.getvalue('deletedatadisk').split(',')
 
@@ -160,7 +168,7 @@ if form.getvalue('deletedatadisk'):
     if valid:
         p = Popen(['/usr/bin/sudo', '/root/vmcontrol/deletedatadisk.py', vmname, datadiskfilename], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
-        message = '<i>Command output from deleting data disk ' + datadiskfilename + ' from VM ' + vmname + ':\n<pre>' + cgi.escape(r) + '</pre></i>'
+        message = '<i>Command output from deleting data disk ' + datadiskfilename + ' from VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
 
@@ -191,11 +199,12 @@ th { text-align: left; }
 '''
 
 if message:
-    print '<p><em>' + message.strip() + '</em></p>'
+    print '<p><em>' + message + '</em></p>'
 
 print '<h2>Current VMs</h2>'
 print '<form method="get" action=""><p><button type="submit">Refresh</button></p></form>'
 print '<form method="post" action="">'
+print '<input type="hidden" id="deletionconfirmed" name="deletionconfirmed" value="false" />'
 print '<table class="vmlist"><tr><th>Name</th><th>Memory</th><th>Cores</th><th>State</th><th>Console VNC</th><th>Control</th><th>Current mounts</th><th>Create data disk</th></tr>\n'
 for vm in vms.itervalues():
     print '<tr>'
@@ -207,7 +216,14 @@ for vm in vms.itervalues():
     print '<td>'
     print '<button type="submit" name="start" value="' + vm['vmname'] + '">Start</button><br/>'
     print '<button type="submit" name="stop" value="' + vm['vmname'] + '" onclick="return confirm(\'Are you sure you want to stop ' + vm['vmname'] + '?\')">Stop</button><br/>'
-    print '<button type="submit" name="delete" value="' + vm['vmname'] + '" onclick="return confirm(\'Are you sure you want to delete ' + vm['vmname'] + '?\')">Delete</button>'
+    print '<button type="submit" name="delete" value="' + vm['vmname'] + '" onclick="'
+    print '    var r = prompt(\'Type ' + vm['vmname'] + ' below to confirm that you really want to delete this VM and all its data disks.\');'
+    print '    if(r == \'' + vm['vmname'] + '\') {'
+    print '        document.getElementById(\'deletionconfirmed\').value = \'true\';'
+    print '        return true;'
+    print '     };'
+    print '     return false;'
+    print '">Delete</button>'
     print '</td>'
 
     print '<td>'
@@ -223,7 +239,14 @@ for vm in vms.itervalues():
 
         print '<td>'
         if re.search(vmimagelocation + vm['vmname'] + '.data\d+.img', mount['file']):
-            print '<button type="submit" name="deletedatadisk" value="' + vm['vmname'] + ',' + mount['file'] + '">Delete</button>'
+            print '<button type="submit" name="deletedatadisk" value="' + vm['vmname'] + ',' + mount['file'] + '" onclick="'
+            print '    var r = prompt(\'Type ' + vm['vmname'] + ' below to confirm that you really want to delete the data disk ' + mount['file'] +'.\');'
+            print '    if(r == \'' + vm['vmname'] + '\') {'
+            print '        document.getElementById(\'deletionconfirmed\').value = \'true\';'
+            print '        return true;'
+            print '     };'
+            print '     return false;'
+            print '">Delete</button>'
         print '</td>'
 
         print '</tr>'
