@@ -12,8 +12,8 @@ As this system was written specifically for a VM host I had, I took the shortcut
 
 ![Screenshot](https://github.com/allanrbo/simple-vmcontrol/blob/master/docs/screenshot1.png?raw=true)
 
-Server set up
--------------
+Server setup
+------------
 My VM host is a basic Debian 7 installation.
 
 ### Script installation
