@@ -8,9 +8,9 @@ I wrote this quick and dirty system because it seemed the existing web UIs there
 As this system was written specifically for a VM host I had, I took the shortcut of hardcoding some paths:
  * VM disk images will be created in /srv/vm/
  * OS installation ISO image files are expected to be in /srv/iso/
- * The scripts in the vmcontrol folder are expected to be in /root/vmcontrol 
+ * The scripts in the vmcontrol folder are expected to be in /root/vmcontrol
 
-![Screenshot](https://github.com/allanrbo/simple-vmcontrol/blob/master/docs/screenshot1.png)
+![Screenshot](https://github.com/allanrbo/simple-vmcontrol/blob/master/docs/screenshot1.png?raw=true)
 
 Server set up
 -------------
@@ -20,9 +20,21 @@ My VM host is a basic Debian 7 installation.
  * Put cgi-bin/vmcontrol.py in /var/www/cgi-bin/
  * Put vmcontrol/* in /root/vmcontrol/
 
+Allow the web server to switch to root to run the control commands by adding the following to /etc/sudoers
+
+    www-data ALL=NOPASSWD: /root/vmcontrol/listvm.py
+    www-data ALL=NOPASSWD: /root/vmcontrol/createvm.py
+    www-data ALL=NOPASSWD: /root/vmcontrol/deletevm.py
+    www-data ALL=NOPASSWD: /root/vmcontrol/mountiso.py
+    www-data ALL=NOPASSWD: /root/vmcontrol/startvm.py
+    www-data ALL=NOPASSWD: /root/vmcontrol/stopvm.py
+    www-data ALL=NOPASSWD: /root/vmcontrol/createdatadisk.py
+    www-data ALL=NOPASSWD: /root/vmcontrol/deletedatadisk.py
+
 ### Web server setup
 
 Installed lighttpd:
+
     apt-get install lighttpd
     lighttpd-enable-mod cgi
     lighttpd-enable-mod ssl
@@ -59,11 +71,13 @@ Restarted Lighttpd for changes to take effect:
 ### KVM and Libvirt setup
 
 Installed KVM and Libvirt:
+
     aptitude install qemu-kvm libvirt-bin
     apt-get install virtinst
     apt-get install bridge-utils
 
 Modified /etc/network/interfaces
+
     allow-hotplug eth0
     iface eth0 inet manual
 
@@ -72,10 +86,12 @@ Modified /etc/network/interfaces
             bridge_ports eth0
 
 Created folder for VM disk images and relocated folder containing save states:
+
     mkdir /srv/vm
     mv /var/lib/libvirt/ /srv/libvirt ; ln -s /srv/libvirt /var/lib/libvirt
 
 Modified /etc/init.d/libvirt-guests
+
     ON_BOOT=start
     ON_SHUTDOWN=suspend
 
