@@ -183,7 +183,6 @@ th { text-align: left; }
 .vmlist th { background-color: #f09911; }
 .vmlist td { background-color: #eeeeee; }
 .blkdevlist td { border-top: 1px solid #656565; }
-blkdevlist
 </style>
 </head>
 
@@ -195,7 +194,7 @@ if message:
     print '<p><em>' + message.strip() + '</em></p>'
 
 print '<h2>Current VMs</h2>'
-print '<form method="get" action=""><button type="submit" >Refresh</button></form>'
+print '<form method="get" action=""><p><button type="submit">Refresh</button></p></form>'
 print '<form method="post" action="">'
 print '<table class="vmlist"><tr><th>Name</th><th>Memory</th><th>Cores</th><th>State</th><th>Console VNC</th><th>Control</th><th>Current mounts</th><th>Create data disk</th></tr>\n'
 for vm in vms.itervalues():
@@ -227,6 +226,8 @@ for vm in vms.itervalues():
             print '<button type="submit" name="deletedatadisk" value="' + vm['vmname'] + ',' + mount['file'] + '">Delete</button>'
         print '</td>'
 
+        print '</tr>'
+
     print '</table>'
     print '<br/>'
     print '<select name="mount_iso_' + vm['vmname'] + '">'
@@ -253,11 +254,13 @@ print '''
 <tr><td>Memory</td><td><input type="text" name="memory" value="256"/> MB</td></tr>
 <tr><td>OS disk size</td><td><input type="text" name="osdisksize" value="10"/> GB</td></tr>
 '''
+print '<tr>'
 print '<td>OS installer ISO</td>'
 print '<td><select name="installiso">'
 for iso in isos:
     print '<option value="' + iso + '">' + iso + '</option>'
-print '</select>'
+print '</select></td>'
+print '</tr>'
 
 print '''
 <tr><td><button type="submit" name="create" value="create">Create</button></td><td></td></tr>
