@@ -66,6 +66,7 @@ Configured lighttpd by adding a file /etc/lighttpd/conf-enabled/myserver.conf:
 Created the file /etc/lighttpd/htpasswd with credentials I wanted to use (used htpasswd to create the file on a different computer which had Apache installed).
 
 Restarted Lighttpd for changes to take effect:
+
     /etc/init.d/lighttpd restart
 
 ### KVM and Libvirt setup
