@@ -42,14 +42,14 @@ for d in os.listdir(configdir):
         # If block device is not a CD-ROM drive
         if mount['file'] != '-' and not mount['file'].endswith('.iso') and os.path.isfile(mount['file']):
             # Get actual file on disk
-            mount['currentsize'] = str(os.path.getsize(mount['file']) / 1024 / 1024 / 1024)
+            mount['currentsize'] = str(os.path.getsize(mount['file']) / 1024L / 1024L / 1024L)
 
             # Use qemu-img to get max size of dynamically expanding images
             p = Popen(['/usr/bin/qemu-img', 'info', mount['file']], stdin=PIPE, stdout=PIPE, stderr=PIPE)
             r = p.communicate()[0]
-            m = re.search(r'virtual size: (\d+)G', r)
+            m = re.search(r'virtual size: [^\(]+\((\d+)', r)
             if m:
-                mount['maxsize'] = m.group(1)
+                mount['maxsize'] = str(long(m.group(1))  / 1024L / 1024L / 1024L)
             else:
                 mount['maxsize'] = mount['currentsize']
 
