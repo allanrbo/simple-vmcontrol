@@ -32,7 +32,7 @@ for d in os.listdir(configdir):
     p = Popen(['/usr/bin/virsh', 'domblklist', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
     r = p.communicate()[0]
     for line in r.strip().splitlines()[2:]:
-        m = re.search(r'(\w+) +(.*)', line)
+        m = re.search(r'(\w+) +([^ ]*)', line)
         mount = {}
         mount['dev'] = m.group(1)
         mount['file'] = m.group(2)
