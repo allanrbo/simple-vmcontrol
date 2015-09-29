@@ -72,7 +72,7 @@ for line in lines[2:]:
     # Determine which port VNC is listening on for this VMs console
     p2 = Popen(['/usr/bin/virsh', 'vncdisplay', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
     r2 = p2.communicate()[0]
-    m2 = re.search(r'(\d+)', r2)
+    m2 = re.search(r':(\d+)', r2)
     vms[vmname]['vncport'] = str(int(m2.group(1)) + 5900)
 
 print json.dumps(vms)
