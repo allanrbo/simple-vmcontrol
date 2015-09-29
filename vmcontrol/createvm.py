@@ -42,6 +42,7 @@ p = Popen([
     '--vcpus=sockets=1,cores=' + cores,
     '--disk', 'path=' + vmimagelocation + vmname + '.os.img,format=qcow2,bus=virtio,cache=writeback',
     '-c', isolocation + installiso,
+    '--boot=cdrom,hd',
     '--accelerate',
     '--bridge=br0',
     '--connect=qemu:///system',
