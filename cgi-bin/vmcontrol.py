@@ -51,7 +51,7 @@ if form.getvalue('create'):
     if valid:
         p = Popen([
             '/usr/bin/sudo',
-            '/root/vmcontrol/createvm.py',
+            '/usr/lib/simple-vmcontrol/vmcontrol/createvm.py',
             vmname,
             cores,
             memory,
@@ -71,7 +71,7 @@ if form.getvalue('stop'):
         valid = False
 
     if valid:
-        p = Popen(['/usr/bin/sudo', '/root/vmcontrol/stopvm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/stopvm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
         message = '<i>Command output from stopping VM ' + vmname + ' ("destroy" means stop in this case):\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
@@ -85,7 +85,7 @@ if form.getvalue('start'):
         valid = False
 
     if valid:
-        p = Popen(['/usr/bin/sudo', '/root/vmcontrol/startvm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/startvm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
         message = '<i>Command output from starting VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
@@ -103,7 +103,7 @@ if form.getvalue('delete'):
         valid = False
 
     if valid:
-        p = Popen(['/usr/bin/sudo', '/root/vmcontrol/deletevm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/deletevm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
         message = '<i>Command output from deleting VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
@@ -124,7 +124,7 @@ if form.getvalue('changeiso'):
         valid = False
 
     if valid:
-        p = Popen(['/usr/bin/sudo', '/root/vmcontrol/mountiso.py', vmname, iso], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/mountiso.py', vmname, iso], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
         message = '<i>Command output from mounting ISO to VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
@@ -143,7 +143,7 @@ if form.getvalue('createdatadisk'):
         valid = False
 
     if valid:
-        p = Popen(['/usr/bin/sudo', '/root/vmcontrol/createdatadisk.py', vmname, datadisksize], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/createdatadisk.py', vmname, datadisksize], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
         message = '<i>Command output from creating data disk for VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
@@ -166,13 +166,13 @@ if form.getvalue('deletedatadisk'):
         valid = False
 
     if valid:
-        p = Popen(['/usr/bin/sudo', '/root/vmcontrol/deletedatadisk.py', vmname, datadiskfilename], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/deletedatadisk.py', vmname, datadiskfilename], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
         message = '<i>Command output from deleting data disk ' + datadiskfilename + ' from VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
 
-p = Popen(['/usr/bin/sudo', '/root/vmcontrol/listvm.py'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/listvm.py'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
 r = p.communicate()[0]
 vms = json.loads(r)
 

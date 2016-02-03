@@ -16,20 +16,23 @@ Server setup
 ------------
 My VM host is a basic Debian 7 installation.
 
-### Script installation
- * Put cgi-bin/vmcontrol.py in /var/www/cgi-bin/
- * Put vmcontrol/* in /root/vmcontrol/
+### Installation
+    cd /usr/lib
+    git clone https://github.com/allanrbo/simple-vmcontrol.git
+
+    mkdir -p /var/www/html/cgi-bin
+    ln -s /usr/lib/simple-vmcontrol/cgi-bin/vmcontrol.py /var/www/cgi-bin/html/vmcontrol.py
 
 Allow the web server to switch to root to run the control commands by adding the following to /etc/sudoers
 
-    www-data ALL=NOPASSWD: /root/vmcontrol/listvm.py
-    www-data ALL=NOPASSWD: /root/vmcontrol/createvm.py
-    www-data ALL=NOPASSWD: /root/vmcontrol/deletevm.py
-    www-data ALL=NOPASSWD: /root/vmcontrol/mountiso.py
-    www-data ALL=NOPASSWD: /root/vmcontrol/startvm.py
-    www-data ALL=NOPASSWD: /root/vmcontrol/stopvm.py
-    www-data ALL=NOPASSWD: /root/vmcontrol/createdatadisk.py
-    www-data ALL=NOPASSWD: /root/vmcontrol/deletedatadisk.py
+    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/listvm.py
+    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/createvm.py
+    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/deletevm.py
+    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/mountiso.py
+    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/startvm.py
+    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/stopvm.py
+    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/createdatadisk.py
+    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/deletedatadisk.py
 
 ### Web server setup
 
