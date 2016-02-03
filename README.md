@@ -21,7 +21,7 @@ My VM host is a basic Debian 7 installation.
     git clone https://github.com/allanrbo/simple-vmcontrol.git
 
     mkdir -p /var/www/html/cgi-bin
-    ln -s /usr/lib/simple-vmcontrol/cgi-bin/vmcontrol.py /var/www/cgi-bin/html/vmcontrol.py
+    ln -s /usr/lib/simple-vmcontrol/cgi-bin/vmcontrol.py /var/www/html/cgi-bin/vmcontrol.py
 
 Allow the web server to switch to root to run the control commands by adding the following to /etc/sudoers
 
