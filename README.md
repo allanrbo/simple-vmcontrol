@@ -33,6 +33,7 @@ Allow the web server to switch to root to run the control commands by adding the
     www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/stopvm.py
     www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/createdatadisk.py
     www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/deletedatadisk.py
+    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/setautostart.py
 
 ### Web server setup
 
