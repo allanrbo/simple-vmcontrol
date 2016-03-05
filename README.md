@@ -38,7 +38,7 @@ Allow the web server to switch to root to run the control commands by adding the
 
 Installed lighttpd:
 
-    apt-get install lighttpd
+    apt-get install lighttpd python
     lighttpd-enable-mod cgi
     lighttpd-enable-mod ssl
     lighttpd-enable-mod auth
@@ -76,9 +76,7 @@ Restarted Lighttpd for changes to take effect:
 
 Installed KVM and Libvirt:
 
-    aptitude install qemu-kvm libvirt-bin
-    apt-get install virtinst
-    apt-get install bridge-utils
+    apt-get install qemu-kvm libvirt-bin virtinst bridge-utils
 
 Modified /etc/network/interfaces
 
@@ -91,6 +89,7 @@ Modified /etc/network/interfaces
 
 Created folder for VM disk images and relocated folder containing save states:
 
+    mkdir /srv/iso
     mkdir /srv/vm
     mv /var/lib/libvirt/ /srv/libvirt ; ln -s /srv/libvirt /var/lib/libvirt
 

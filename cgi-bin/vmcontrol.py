@@ -90,22 +90,46 @@ if form.getvalue('start'):
         message = '<i>Command output from starting VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
-if form.getvalue('delete'):
+if form.getvalue('autostarton'):
     valid = True
 
-    deletionconfirmed = form.getvalue('deletionconfirmed')
-    if deletionconfirmed != 'true':
-        valid = False
-
-    vmname = form.getvalue('delete')
+    vmname = form.getvalue('autostarton')
     if not vmname or re.search('[^\w]', vmname):
         message = 'Name can only be alphanumeric chars'
         valid = False
 
     if valid:
-        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/deletevm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/setautostart.py', vmname, 'True'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         r = '\n'.join(p.communicate())
-        message = '<i>Command output from deleting VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
+        message = '<i>Command output from enabling autostart for VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
+
+
+if form.getvalue('autostartoff'):
+    valid = True
+
+    vmname = form.getvalue('autostartoff')
+    if not vmname or re.search('[^\w]', vmname):
+        message = 'Name can only be alphanumeric chars'
+        valid = False
+
+    if valid:
+        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/setautostart.py', vmname, 'False'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        r = '\n'.join(p.communicate())
+        message = '<i>Command output from disabling autostart for VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
+
+
+if form.getvalue('start'):
+    valid = True
+
+    vmname = form.getvalue('start')
+    if not vmname or re.search('[^\w]', vmname):
+        message = 'Name can only be alphanumeric chars'
+        valid = False
+
+    if valid:
+        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/startvm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        r = '\n'.join(p.communicate())
+        message = '<i>Command output from starting VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
 if form.getvalue('changeiso'):
@@ -205,13 +229,14 @@ print '<h2>Current VMs</h2>'
 print '<form method="get" action=""><p><button type="submit">Refresh</button></p></form>'
 print '<form method="post" action="">'
 print '<input type="hidden" id="deletionconfirmed" name="deletionconfirmed" value="false" />'
-print '<table class="vmlist"><tr><th>Name</th><th>Memory</th><th>Cores</th><th>State</th><th>Console VNC</th><th>Control</th><th>Current mounts</th><th>Create data disk</th></tr>\n'
+print '<table class="vmlist"><tr><th>Name</th><th>Memory</th><th>Cores</th><th>State</th><th>Auto start</th><th>Console VNC</th><th>Control</th><th>Current mounts</th><th>Create data disk</th></tr>\n'
 for vm in vms.itervalues():
     print '<tr>'
     print '<td>' + vm['vmname'] + '</td>'
     print '<td>' + str(vm['memory']) + ' MB</td>'
     print '<td>' + str(vm['cores']) + '</td>'
     print '<td>' + vm['state'] + '</td>'
+    print '<td>' + str(vm['autostart']) + '</td>'
     print '<td>' + ('localhost:' + vm['vncport'] if vm['vncport'] else '') + '</td>'
     print '<td>'
     print '<button type="submit" name="start" value="' + vm['vmname'] + '">Start</button><br/>'
@@ -223,7 +248,9 @@ for vm in vms.itervalues():
     print '        return true;'
     print '     };'
     print '     return false;'
-    print '">Delete</button>'
+    print '">Delete</button><br/>'
+    print '<button type="submit" name="autostarton" value="' + vm['vmname'] + '">Autostart on</button><br/>'
+    print '<button type="submit" name="autostartoff" value="' + vm['vmname'] + '">Autostart off</button><br/>'
     print '</td>'
 
     print '<td>'

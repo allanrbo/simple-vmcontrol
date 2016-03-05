@@ -27,6 +27,8 @@ for d in os.listdir(configdir):
     vm['memory'] = int(configXml.find('./memory').text) / 1024
     vm['cores'] = int(configXml.find('./cpu/topology').attrib['cores'])
 
+    vm['autostart'] = os.path.exists('/etc/libvirt/qemu/autostart/' + vmname + '.xml')
+
     # Loop over mounted block devices
     mounts = []
     p = Popen(['/usr/bin/virsh', 'domblklist', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
