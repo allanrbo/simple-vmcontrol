@@ -132,6 +132,24 @@ if form.getvalue('start'):
         message = '<i>Command output from starting VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
+if form.getvalue('delete'):
+    valid = True
+
+    deletionconfirmed = form.getvalue('deletionconfirmed')
+    if deletionconfirmed != 'true':
+        valid = False
+
+    vmname = form.getvalue('delete')
+    if not vmname or re.search('[^\w]', vmname):
+        message = 'Name can only be alphanumeric chars'
+        valid = False
+
+    if valid:
+        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/deletevm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        r = '\n'.join(p.communicate())
+        message = '<i>Command output from deleting VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
+
+
 if form.getvalue('changeiso'):
     valid = True
 
