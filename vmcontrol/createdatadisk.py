@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 
 from subprocess import Popen, PIPE
+import json
 import os
 import re
 import sys
 
-vmimagelocation = '/srv/vm/'
+config = json.loads(open(os.path.dirname(os.path.abspath(__file__)) + '/../config.json', 'r').read())
+
+datadisklocation = '/srv/vm/'
+if 'datadisklocation' in config:
+    datadisklocation = config['datadisklocation']
 
 vmname = sys.argv[1]
 if re.search('[^\w]', vmname):
@@ -15,9 +20,9 @@ datadisksize = str(int(sys.argv[2]))
 
 # Find unique file name
 i = 1
-while os.path.isfile(vmimagelocation + vmname + '.data' + str(i) + '.img'):
+while os.path.isfile(datadisklocation + vmname + '.data' + str(i) + '.img'):
     i = i + 1
-filename = vmimagelocation + vmname + '.data' + str(i) + '.img'
+filename = datadisklocation + vmname + '.data' + str(i) + '.img'
 
 # Find unique device name
 devnames = [

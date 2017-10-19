@@ -7,7 +7,12 @@ import json
 import os
 import re
 
-vmimagelocation = '/srv/vm/'
+config = json.loads(open('/usr/lib/simple-vmcontrol/config.json', 'r').read())
+
+datadisklocation = '/srv/vm/'
+if 'datadisklocation' in config:
+    datadisklocation = config['datadisklocation']
+
 isolocation = '/srv/iso/'
 
 # CGI troubleshooting
@@ -203,7 +208,7 @@ if form.getvalue('deletedatadisk'):
         message = 'Name can only be alphanumeric chars'
         valid = False
 
-    if not re.search(vmimagelocation + vmname + '.data\d+.img', datadiskfilename):
+    if not re.search(datadisklocation + vmname + '.data\d+.img', datadiskfilename):
         message = 'Invalid data disk name'
         valid = False
 
@@ -283,7 +288,7 @@ for vm in vms.itervalues():
         print '<td>' + maxsize + '</td>'
 
         print '<td>'
-        if re.search(vmimagelocation + vm['vmname'] + '.data\d+.img', mount['file']):
+        if re.search(datadisklocation + vm['vmname'] + '.data\d+.img', mount['file']):
             print '<button type="submit" name="deletedatadisk" value="' + vm['vmname'] + ',' + mount['file'] + '" onclick="'
             print '    var r = prompt(\'Type ' + vm['vmname'] + ' below to confirm that you really want to delete the data disk ' + mount['file'] +'.\');'
             print '    if(r == \'' + vm['vmname'] + '\') {'
