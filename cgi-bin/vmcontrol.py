@@ -288,7 +288,7 @@ for vm in vms.itervalues():
         print '<td>' + maxsize + '</td>'
 
         print '<td>'
-        if re.search(datadisklocation + vm['vmname'] + '.data\d+.img', mount['file']):
+        if re.search(datadisklocation + vm['vmname'] + '.data\d+.img', mount['file']) and os.path.isfile(mount['file']):
             print '<button type="submit" name="deletedatadisk" value="' + vm['vmname'] + ',' + mount['file'] + '" onclick="'
             print '    var r = prompt(\'Type ' + vm['vmname'] + ' below to confirm that you really want to delete the data disk ' + mount['file'] +'.\');'
             print '    if(r == \'' + vm['vmname'] + '\') {'
