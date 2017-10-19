@@ -7,7 +7,9 @@ import json
 import os
 import re
 
-config = json.loads(open('/usr/lib/simple-vmcontrol/config.json', 'r').read())
+config = dict()
+if os.path.isfile('/usr/lib/simple-vmcontrol/config.json'):
+    config = json.loads(open('/usr/lib/simple-vmcontrol/config.json', 'r').read())
 
 datadisklocation = '/srv/vm/'
 if 'datadisklocation' in config:
