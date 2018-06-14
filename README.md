@@ -79,16 +79,16 @@ Restarted Lighttpd for changes to take effect:
 
 Installed KVM and Libvirt:
 
-    apt-get install qemu-kvm libvirt-bin virtinst bridge-utils
+    apt-get install qemu-kvm virtinst bridge-utils libvirt-clients libvirt-daemon-system
 
 Modified /etc/network/interfaces
 
-    allow-hotplug eth0
-    iface eth0 inet manual
+    allow-hotplug eno1
+    iface eno1 inet manual
 
     auto br0
     iface br0 inet dhcp
-            bridge_ports eth0
+        bridge_ports eno1
 
 Created folder for VM disk images and relocated folder containing save states:
 
