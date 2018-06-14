@@ -8,7 +8,6 @@ I wrote this quick and dirty system because it seemed the existing web UIs there
 As this system was written specifically for a VM host I had, I took the shortcut of hardcoding some paths:
  * VM disk images will be created in /srv/vm/
  * OS installation ISO image files are expected to be in /srv/iso/
- * The scripts in the vmcontrol folder are expected to be in /root/vmcontrol
 
 ![Screenshot](https://github.com/allanrbo/simple-vmcontrol/blob/master/docs/screenshot1.png?raw=true)
 
