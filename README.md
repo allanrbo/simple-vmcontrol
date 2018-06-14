@@ -44,7 +44,7 @@ Installed lighttpd:
     lighttpd-enable-mod ssl
     lighttpd-enable-mod auth
     cd /etc/lighttpd/
-    openssl req -new -x509 -keyout server.pem -out server.pem -days 3650 -nodes
+    openssl req -new -key server.key -subj "/CN=server" -x509 -days 3650 -out server.crt
     chmod 400 server.pem
 
 Configured lighttpd by adding a file /etc/lighttpd/conf-enabled/myserver.conf:
