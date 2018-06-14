@@ -46,6 +46,7 @@ Installed lighttpd:
     cd /etc/lighttpd/
     openssl genrsa -out server.key 2048
     openssl req -new -key server.key -subj "/CN=server" -x509 -days 3650 -out server.crt
+    cat server.crt server.key > server.pem
     chmod 400 server.pem
 
 Configured lighttpd by adding a file /etc/lighttpd/conf-enabled/myserver.conf:
