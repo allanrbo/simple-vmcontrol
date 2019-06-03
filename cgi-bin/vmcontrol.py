@@ -254,7 +254,7 @@ print '<h2>Current VMs</h2>'
 print '<form method="get" action=""><p><button type="submit">Refresh</button></p></form>'
 print '<form method="post" action="">'
 print '<input type="hidden" id="deletionconfirmed" name="deletionconfirmed" value="false" />'
-print '<table class="vmlist"><tr><th>Name</th><th>Memory</th><th>Cores</th><th>State</th><th>Auto start</th><th>Console VNC</th><th>Control</th><th>Current mounts</th><th>Create data disk</th></tr>\n'
+print '<table class="vmlist"><tr><th>Name</th><th>Memory</th><th>Cores</th><th>State</th><th>Auto start</th><th>Console VNC</th><th>Control</th><th>Current mounts</th><th>Create data disk</th><th>Network</th></tr>\n'
 for vm in vms.itervalues():
     print '<tr>'
     print '<td>' + vm['vmname'] + '</td>'
@@ -317,6 +317,20 @@ for vm in vms.itervalues():
     print 'Grow to max <input name="datadisk_size_' + vm['vmname'] + '" size="3"/> GB<br/>'
     print '<button type="submit" name="createdatadisk" value="' + vm['vmname'] + '">Create</button>'
     print '</td>'
+
+
+    print '<td>'
+    print '<table class="iflist"><tr><th>Iface</th><th>Model</th><th>MAC</th></tr>'
+    for iface in vm['interfaces']:
+        print '<tr>'
+        print '<td>' + iface['iface'] + '</td>'
+        print '<td>' + iface['model'] + '</td>'
+        print '<td>' + iface['mac'] + '</td>'
+        print '</tr>'
+
+    print '</table>'
+    print '</td>'
+
 
     print '</tr>'
 print '</table>'

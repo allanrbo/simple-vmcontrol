@@ -59,6 +59,24 @@ for d in os.listdir(configdir):
 
     vm['mounts'] = mounts
 
+    # Find network interfaces
+    interfaces = []
+    p = Popen(['/usr/bin/virsh', 'domiflist', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    r = p.communicate()[0]
+    for line in r.strip().splitlines()[2:]:
+        s = line.split()
+        iface = {}
+        iface['iface'] = s[0]
+        iface['type'] = s[1]
+        iface['source'] = s[2]
+        iface['model'] = s[3]
+        iface['mac'] = s[4]
+
+        interfaces.append(iface)
+
+    vm['interfaces'] = interfaces
+
+
     vms[vmname] = vm
 
 
