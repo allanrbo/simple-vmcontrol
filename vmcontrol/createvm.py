@@ -46,6 +46,7 @@ p = Popen([
     '--accelerate',
     '--bridge=br0',
     '--connect=qemu:///system',
+    '--video=vga',
     '--vnc',
     '--noautoconsole',
     '-v'

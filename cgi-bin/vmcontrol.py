@@ -340,7 +340,7 @@ print '''
 <table>
 <tr><td>Name</td><td><input type="text" name="vmname"/></td></tr>
 <tr><td>Cores</td><td><input type="text" name="cores" value="2"/></td></tr>
-<tr><td>Memory</td><td><input type="text" name="memory" value="256"/> MB</td></tr>
+<tr><td>Memory</td><td><input type="text" name="memory" value="512"/> MB</td></tr>
 <tr><td>OS disk size</td><td><input type="text" name="osdisksize" value="10"/> GB</td></tr>
 '''
 print '<tr>'
