@@ -69,6 +69,20 @@ if form.getvalue('create'):
         message = '<i>Command output from creating VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
 
 
+if form.getvalue('shutdown'):
+    valid = True
+
+    vmname = form.getvalue('shutdown')
+    if not vmname or re.search('[^\w]', vmname):
+        message = 'Name can only be alphanumeric chars'
+        valid = False
+
+    if valid:
+        p = Popen(['/usr/bin/sudo', '/usr/lib/simple-vmcontrol/vmcontrol/shutdownvm.py', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        r = '\n'.join(p.communicate())
+        message = '<i>Command output from shutdown of VM ' + vmname + ':\n<pre>' + cgi.escape(r).strip() + '</pre></i>'
+
+
 if form.getvalue('stop'):
     valid = True
 
@@ -265,6 +279,7 @@ for vm in vms.itervalues():
     print '<td>' + ('localhost:' + vm['vncport'] if vm['vncport'] else '') + '</td>'
     print '<td>'
     print '<button type="submit" name="start" value="' + vm['vmname'] + '">Start</button><br/>'
+    print '<button type="submit" name="shutdown" value="' + vm['vmname'] + '" onclick="return confirm(\'Are you sure you want to shut down ' + vm['vmname'] + '?\')">Shutdown</button><br/>'
     print '<button type="submit" name="stop" value="' + vm['vmname'] + '" onclick="return confirm(\'Are you sure you want to stop ' + vm['vmname'] + '?\')">Stop</button><br/>'
     print '<button type="submit" name="delete" value="' + vm['vmname'] + '" onclick="'
     print '    var r = prompt(\'Type ' + vm['vmname'] + ' below to confirm that you really want to delete this VM and all its data disks.\');'
