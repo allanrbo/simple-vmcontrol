@@ -325,7 +325,7 @@ for vm in vms.itervalues():
     for iso in isos:
         print '<option value="' + iso + '">' + iso + '</option>'
     print '</select><br/>'
-    print '<button type="submit" name="changeiso" value="' + vm['vmname'] + '">Change ISO in hdc</button>'
+    print '<button type="submit" name="changeiso" value="' + vm['vmname'] + '">Change ISO</button>'
     print '</td>'
 
     print '<td>'

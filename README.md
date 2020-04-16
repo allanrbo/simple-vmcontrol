@@ -13,7 +13,7 @@ As this system was written specifically for a VM host I had, I took the shortcut
 
 Server setup
 ------------
-My VM host is a basic Debian 7 installation.
+My VM host is an Ubuntu 18.04 installation.
 
 ### Installation
     cd /usr/lib
@@ -33,22 +33,22 @@ Allow the web server to switch to root to run the control commands by adding the
     www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/createdatadisk.py
     www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/deletedatadisk.py
     www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/setautostart.py
+    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/shutdownvm.py
 
 ### Web server setup
 
 Installed lighttpd:
 
     apt-get install lighttpd python
+    rm /var/www/html/index.lighttpd.html
     lighttpd-enable-mod cgi
     lighttpd-enable-mod ssl
     lighttpd-enable-mod auth
     cd /etc/lighttpd/
-    openssl genrsa -out server.key 2048
-    openssl req -new -key server.key -subj "/CN=server" -x509 -days 3650 -out server.crt
-    cat server.crt server.key > server.pem
+    openssl req -x509 -nodes -newkey rsa:2048 -keyout server.pem -out server.pem -days 3650 -subj "/CN=server" -sha256
     chmod 400 server.pem
 
-Configured lighttpd by adding a file /etc/lighttpd/conf-enabled/myserver.conf:
+Configured lighttpd by adding a file /etc/lighttpd/conf-enabled/myserver.conf
 
     # Only allow https on vmcontrol.py
     $HTTP["scheme"] == "http" {
@@ -78,20 +78,56 @@ Restarted Lighttpd for changes to take effect:
 
 Installed KVM and Libvirt:
 
-    apt-get install qemu-kvm virtinst bridge-utils libvirt-clients libvirt-daemon-system
+    apt-get install qemu-kvm virtinst bridge-utils libvirt-clients libvirt-daemon-system qemu-utils --no-install-recommends
 
-Modified /etc/network/interfaces
+Find the name of your ethernet interface from the existing config file (for example enp1s0f0):
 
-    allow-hotplug eno1
-    iface eno1 inet manual
+    cat /etc/netplan/50-cloud-init.yaml
 
-    auto br0
-    iface br0 inet dhcp
-        bridge_ports eno1
+Write a new config file with a bridge configuration in (use your relevant ethernet interface name in place of enp1s0f0, and your IP settings). Create /etc/netplan/60-br0.yaml
+
+    network:
+      version: 2
+      ethernets:
+        enp1s0f0:
+          dhcp4: false
+      bridges:
+        br0:
+          dhcp4: false
+          interfaces:
+            - enp1s0f0
+          addresses: [ 10.160.1.21/16 ]
+          gateway4: 10.160.0.1
+          interfaces: [enp1s0f0]
+          nameservers:
+            addresses: [8.8.8.8, 8.8.4.4]
+
+Applied the network config:
+
+    rm /etc/netplan/50-cloud-init.yaml
+    echo "network: {config: disabled}" > /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+    netplan --debug generate
+    netplan --debug apply
+
+Set up libvirt to use this bridge (use whatever uuid it generated for you):
+
+    virsh net-edit default
+        <network>
+          <uuid>391a0f4c-a39a-40d4-bf9a-d158c1ff520d</uuid>
+          <name>default</name>
+          <forward mode='bridge'/>
+          <bridge name='br0'/>
+        </network>
+    virsh net-destroy default
+    virsh net-start default
+    virsh net-autostart default
+    virsh net-list
 
 Created folder for VM disk images and relocated folder containing save states:
 
     mkdir /srv/iso
+    cd /srv/iso
+    wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso
     mkdir /srv/vm
     mv /var/lib/libvirt/ /srv/libvirt ; ln -s /srv/libvirt /var/lib/libvirt
 
