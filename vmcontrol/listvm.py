@@ -47,7 +47,7 @@ for d in os.listdir(configdir):
             mount['currentsize'] = str(os.path.getsize(mount['file']) / 1024L / 1024L / 1024L)
 
             # Use qemu-img to get max size of dynamically expanding images
-            p = Popen(['/usr/bin/qemu-img', 'info', mount['file']], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+            p = Popen(['/usr/bin/qemu-img', 'info', '--force-share', mount['file']], stdin=PIPE, stdout=PIPE, stderr=PIPE)
             r = p.communicate()[0]
             m = re.search(r'virtual size: [^\(]+\((\d+)', r)
             if m:
