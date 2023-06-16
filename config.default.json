@@ -1,0 +1,10 @@
+{
+    "port": 1443,
+    "cert_pem_path": "/etc/ssl/simple-vmcontrol.pem",
+    "vmimagelocation": "/srv/vm/",
+    "datadisklocation": "/srv/vm/",
+    "isolocation": "/srv/iso/",
+    "users": {
+        "user1": "bae5f5732c32ed2539087acd9d0e14a9e3cef66f552d0a5b3e8d1c4a9570a49c85b77714e3da42da99b139db68c450142a128d33aaeb5414f4deee6e8dac4177",
+    }
+}

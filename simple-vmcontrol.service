@@ -1,0 +1,14 @@
+[Unit]
+Description=simple-vmcontrol
+After=network.target
+
+[Service]
+Type=simple
+User=simple-vmcontrol_svc
+WorkingDirectory=/
+ExecStart=/usr/bin/python3 /usr/lib/simple-vmcontrol/simple-vmcontrol.py
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target

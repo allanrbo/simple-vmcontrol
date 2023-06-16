@@ -16,67 +16,52 @@ Server setup
 My VM host is an Ubuntu 18.04 installation.
 
 ### Installation
+
+Run the following as root:
+
+    useradd simple-vmcontrol_svc
+
     cd /usr/lib
     git clone https://github.com/allanrbo/simple-vmcontrol.git
+    cd simple-vmcontrol
+    cp config.default.json config.json
+    # Modify config.json as needed.
+    # Generate password hashes using generate_password_hash.py.
 
-    mkdir -p /var/www/html/cgi-bin
-    ln -s /usr/lib/simple-vmcontrol/cgi-bin/vmcontrol.py /var/www/html/cgi-bin/vmcontrol.py
+    # Generate web server's HTTPS cert:
+    openssl genrsa -out /etc/ssl/simple-vmcontrol.key 2048
+    openssl req -new -key /etc/ssl/simple-vmcontrol.key -subj "/CN=server" -x509 -days 3650 -out /etc/ssl/simple-vmcontrol.crt
+    cat /etc/ssl/simple-vmcontrol.crt /etc/ssl/simple-vmcontrol.key > /etc/ssl/simple-vmcontrol.pem
+    chown simple-vmcontrol_svc:simple-vmcontrol_svc /etc/ssl/simple-vmcontrol.*
+    chmod 600 /etc/ssl/simple-vmcontrol.*
+
+    # Create the Systemd service:
+    cp /usr/lib/simple-vmcontrol/simple-vmcontrol.service /etc/systemd/system/simple-vmcontrol.service
+    systemctl daemon-reload
+    systemctl enable simple-vmcontrol
+    systemctl stop simple-vmcontrol
+    systemctl start simple-vmcontrol
+    systemctl status simple-vmcontrol
+    journalctl --follow --unit simple-vmcontrol
+
 
 Allow the web server to switch to root to run the control commands by adding the following to /etc/sudoers
 
-    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/listvm.py
-    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/createvm.py
-    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/deletevm.py
-    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/mountiso.py
-    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/startvm.py
-    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/stopvm.py
-    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/createdatadisk.py
-    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/deletedatadisk.py
-    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/setautostart.py
-    www-data ALL=NOPASSWD: /usr/lib/simple-vmcontrol/vmcontrol/shutdownvm.py
+    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/listvm.py
+    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/createvm.py
+    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/deletevm.py
+    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/mountiso.py
+    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/startvm.py
+    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/stopvm.py
+    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/createdatadisk.py
+    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/deletedatadisk.py
+    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/setautostart.py
+    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/shutdownvm.py
 
-### Web server setup
-
-Installed lighttpd:
-
-    apt-get install lighttpd python
-    rm /var/www/html/index.lighttpd.html
-    lighttpd-enable-mod cgi
-    lighttpd-enable-mod ssl
-    lighttpd-enable-mod auth
-    cd /etc/lighttpd/
-    openssl req -x509 -nodes -newkey rsa:2048 -keyout server.pem -out server.pem -days 3650 -subj "/CN=server" -sha256
-    chmod 400 server.pem
-
-Configured lighttpd by adding a file /etc/lighttpd/conf-enabled/myserver.conf
-
-    # Only allow https on vmcontrol.py
-    $HTTP["scheme"] == "http" {
-        $HTTP["url"] =~ "^/cgi-bin/vmcontrol.py" {
-             url.access-deny = ("")
-        }
-    }
-
-    # Require login for vmcontrol.pyn
-    $HTTP["url"] =~ "^/cgi-bin/vmcontrol.py" {
-        auth.backend = "htpasswd"
-        auth.backend.htpasswd.userfile = "/etc/lighttpd/htpasswd"
-        auth.require = ( "" => (
-            "method"  => "basic",
-            "realm"   => "",
-            "require" => "valid-user"
-        ))
-    }
-
-Created the file /etc/lighttpd/htpasswd with credentials I wanted to use (for example use http://aspirine.org/htpasswd_en.html ).
-
-Restarted Lighttpd for changes to take effect:
-
-    /etc/init.d/lighttpd restart
 
 ### KVM and Libvirt setup
 
-Installed KVM and Libvirt:
+Install KVM and Libvirt:
 
     apt-get install qemu-kvm virtinst bridge-utils libvirt-clients libvirt-daemon-system qemu-utils --no-install-recommends
 
@@ -102,7 +87,7 @@ Write a new config file with a bridge configuration in (use your relevant ethern
           nameservers:
             addresses: [8.8.8.8, 8.8.4.4]
 
-Applied the network config:
+Apply the network config:
 
     rm /etc/netplan/50-cloud-init.yaml
     echo "network: {config: disabled}" > /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
@@ -123,7 +108,7 @@ Set up libvirt to use this bridge (use whatever uuid it generated for you):
     virsh net-autostart default
     virsh net-list
 
-Created folder for VM disk images and relocated folder containing save states:
+Create folder for VM disk images and relocated folder containing save states:
 
     mkdir /srv/iso
     cd /srv/iso
@@ -131,7 +116,7 @@ Created folder for VM disk images and relocated folder containing save states:
     mkdir /srv/vm
     mv /var/lib/libvirt/ /srv/libvirt ; ln -s /srv/libvirt /var/lib/libvirt
 
-Modified /etc/init.d/libvirt-guests
+Modify /etc/init.d/libvirt-guests
 
     ON_BOOT=start
     ON_SHUTDOWN=suspend
