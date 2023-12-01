@@ -58,7 +58,7 @@ Install KVM and Libvirt:
 
     apt-get install qemu-kvm virtinst bridge-utils libvirt-clients libvirt-daemon-system qemu-utils --no-install-recommends
 
-Modify /etc/init.d/libvirt-guests
+Modify /etc/default/libvirt-guests
 
     ON_BOOT=start
     ON_SHUTDOWN=suspend
@@ -84,6 +84,21 @@ auto br0
 iface br0 inet dhcp
         bridge_ports enp1s0
 ```
+
+Set up libvirt to use this bridge (use whatever uuid it generated for you):
+
+    virsh net-edit default
+        <network>
+          <uuid>391a0f4c-a39a-40d4-bf9a-d158c1ff520d</uuid>
+          <name>default</name>
+          <forward mode='bridge'/>
+          <bridge name='br0'/>
+        </network>
+    virsh net-destroy default
+    virsh net-start default
+    virsh net-autostart default
+    virsh net-list
+
 
 #### Ubuntu
 
