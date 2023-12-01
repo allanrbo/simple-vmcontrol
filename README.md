@@ -3,11 +3,7 @@ Simple VM Control UI
 
 Very minimal web UI for creating and deleting Libvirt/KVM VMs.
 
-I wrote this quick and dirty system because it seemed the existing web UIs there were for Libvirt/KVM had more dependencies than I wanted to have installed on my VM host. This system is therefore fairly self contained and only dependant on Python and Lighttpd, besides Libvirt and KVM itself of course. No other libraries needed.
-
-As this system was written specifically for a VM host I had, I took the shortcut of hardcoding some paths:
- * VM disk images will be created in /srv/vm/
- * OS installation ISO image files are expected to be in /srv/iso/
+I wrote this quick and dirty system because it seemed the existing web UIs there were for Libvirt/KVM had more dependencies than I wanted to have installed on my VM host. This system is therefore self contained and only dependant on Python 3, besides Libvirt and KVM itself of course. No other libraries needed.
 
 ![Screenshot](https://github.com/allanrbo/simple-vmcontrol/blob/master/docs/screenshot1.png?raw=true)
 
@@ -47,7 +43,7 @@ Run the following as root:
     systemctl status simple-vmcontrol
     journalctl --follow --unit simple-vmcontrol
 
-Create folder for VM disk images and install images:
+Create directory for VM disk images and install images:
 
     mkdir /srv/vm
     mkdir /srv/iso
