@@ -25,7 +25,7 @@ Run the following as root:
     # Generate password hashes using generate_password_hash.py.
 
     # Configure sudo to allow the web server to switch to root to run the libvirt control commands:
-    cp simple-vmcontrol.sudoers.conf /etc/sudoers.d/
+    cp simple-vmcontrol-sudoers /etc/sudoers.d/
 
     # Generate web server's HTTPS cert:
     openssl genrsa -out /etc/ssl/simple-vmcontrol.key 2048
