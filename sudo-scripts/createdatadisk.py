@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from subprocess import Popen, PIPE
 import json
@@ -31,7 +31,7 @@ devnames = [
     'vdy','vdz'
 ]
 p = Popen(['/usr/bin/virsh', 'domblklist', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r = p.communicate()[0]
+r = p.communicate()[0].decode('utf-8')
 i = 0
 while re.search('^ *' + devnames[i] +' +', r, re.MULTILINE):
     i = i + 1
@@ -45,7 +45,7 @@ p = Popen([
     filename,
     datadisksize + 'G'
     ], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r = '\n'.join(p.communicate())
+r = b'\n'.join(p.communicate())
 
 # Attach image file
 p = Popen([
@@ -59,6 +59,6 @@ p = Popen([
     '--cache', 'writeback',
     '--persistent'
     ], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r = '\n'.join(p.communicate())
+r = b'\n'.join(p.communicate())
 
-print r
+print(r.decode('utf-8'))

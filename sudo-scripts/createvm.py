@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from subprocess import Popen, PIPE
 import json
@@ -37,7 +37,7 @@ p = Popen([
     config['vmimagelocation'] + vmname + '.os.img',
     osdisksize + 'G'
     ], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r = '\n'.join(p.communicate())
+r = b'\n'.join(p.communicate())
 
 # Create the VM
 p = Popen([
@@ -54,8 +54,9 @@ p = Popen([
     '--video=vga',
     '--vnc',
     '--noautoconsole',
+    '--osinfo', 'detect=on,require=off',
     '-v'
     ], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r += '\n'.join(p.communicate())
+r += b'\n'.join(p.communicate())
 
-print r
+print(r.decode('utf-8'))

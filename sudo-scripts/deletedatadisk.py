@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from subprocess import Popen, PIPE
 import json
@@ -23,17 +23,17 @@ if not re.search(config['datadisklocation'] + vmname + '.data\d+\.img', datadisk
 
 # Find the device name for this data disk image file name
 p = Popen(['/usr/bin/virsh', 'domblklist', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r2 = p.communicate()[0]
+r2 = p.communicate()[0].decode("utf-8")
 m  = re.search('^ *(\w+) +' + datadiskfilename, r2, re.MULTILINE)
 devname = m.group(1)
 
 # Detach the disk image
 p = Popen(['/usr/bin/virsh', 'detach-disk', vmname, devname, '--config'],
     stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r = '\n'.join(p.communicate())
+r = b'\n'.join(p.communicate())
 
 os.remove(datadiskfilename)
 
-r += '\nNote: Disk will first disappear fully on VM restart\n'
+r += b'\nNote: Disk will first disappear fully on VM restart\n'
 
-print r
+print(r.decode('utf-8'))

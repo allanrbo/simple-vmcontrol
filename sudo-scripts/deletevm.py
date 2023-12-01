@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from subprocess import Popen, PIPE
 import json
@@ -19,11 +19,11 @@ if re.search('[^\w]', vmname):
 
 # Stop the VM
 p = Popen(['/usr/bin/virsh', 'destroy', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r = '\n'.join(p.communicate())
+r = b'\n'.join(p.communicate())
 
 # Delete the VM
 p = Popen(['/usr/bin/virsh', 'undefine', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r += '\n'.join(p.communicate())
+r += b'\n'.join(p.communicate())
 
 # Delete OS disk image
 os.remove(config['vmimagelocation'] + vmname + '.os.img')
@@ -33,4 +33,4 @@ for filename in os.listdir(config['datadisklocation']):
     if re.search(vmname +'.data\d+.img', filename):
         os.remove(config['datadisklocation'] + filename)
 
-print r
+print(r.decode('utf-8'))

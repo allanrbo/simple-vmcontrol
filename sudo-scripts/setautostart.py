@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from subprocess import Popen, PIPE
 import os
@@ -20,5 +20,5 @@ if not autostartstate:
     command.append('--disable')
 
 p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r = '\n'.join(p.communicate())
-print r
+r = b'\n'.join(p.communicate())
+print(r.decode('utf-8'))

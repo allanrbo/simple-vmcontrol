@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from subprocess import Popen, PIPE
 import json
@@ -33,28 +33,31 @@ if cdromdev == '':
     raise Exception('cdrom device not found')
 
 # Always eject existing ISO if there is any
+p = Popen(['/usr/bin/virsh', 'change-media', vmname, cdromdev, '--eject', '--force'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+p.communicate()
 p = Popen(['/usr/bin/virsh', 'change-media', vmname, cdromdev, '--eject', '--config'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r = '\n'.join(p.communicate())
+p.communicate()
 
+r = b''
 if iso != '':
     # Determine if VM is running
     p = Popen(['/usr/bin/virsh', 'list'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    r2 = p.communicate()[0]
+    r2 = p.communicate()[0].decode('utf-8')
     m = re.search(vmname +' +running', r2)
     running = m != None
 
     if running:
         p = Popen(['/usr/bin/virsh', 'attach-disk', vmname, config["isolocation"] + iso, cdromdev, '--type', 'cdrom'],
             stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        r += '\n'.join(p.communicate())
+        r += b'\n'.join(p.communicate())
     else:
         # If VM was not running, the ISO file would not be persisted unless the cdrom dev was recreated. Perhaps a bug in virsh.
         p = Popen(['/usr/bin/virsh', 'detach-disk', vmname, cdromdev, '--config'],
             stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        r += '\n'.join(p.communicate())
+        r += b'\n'.join(p.communicate())
 
         p = Popen(['/usr/bin/virsh', 'attach-disk', vmname, config["isolocation"] + iso, cdromdev, '--type', 'cdrom', '--config'],
             stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        r += '\n'.join(p.communicate())
+        r += b'\n'.join(p.communicate())
 
-print r
+print(r.decode('utf-8'))

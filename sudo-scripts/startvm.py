@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 from subprocess import Popen, PIPE
 import re
@@ -9,6 +9,6 @@ if re.search('[^\w]', vmname):
     raise Exception('Name can only be alphanumeric chars')
 
 p = Popen(['/usr/bin/virsh', 'start', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r = '\n'.join(p.communicate())
+r = b'\n'.join(p.communicate())
 
-print r
+print(r.decode('utf-8'))

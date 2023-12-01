@@ -13,7 +13,7 @@ As this system was written specifically for a VM host I had, I took the shortcut
 
 Server setup
 ------------
-My VM host is an Ubuntu 18.04 installation.
+My VM host is a Debian 12 installation.
 
 ### Installation
 
@@ -27,6 +27,9 @@ Run the following as root:
     cp config.default.json config.json
     # Modify config.json as needed.
     # Generate password hashes using generate_password_hash.py.
+
+    # Configure sudo to allow the web server to switch to root to run the libvirt control commands:
+    cp simple-vmcontrol.sudoers.conf /etc/sudoers.d/
 
     # Generate web server's HTTPS cert:
     openssl genrsa -out /etc/ssl/simple-vmcontrol.key 2048
@@ -44,26 +47,49 @@ Run the following as root:
     systemctl status simple-vmcontrol
     journalctl --follow --unit simple-vmcontrol
 
+Create folder for VM disk images and install images:
 
-Allow the web server to switch to root to run the control commands by adding the following to /etc/sudoers
+    mkdir /srv/vm
+    mkdir /srv/iso
+    cd /srv/iso
 
-    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/listvm.py
-    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/createvm.py
-    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/deletevm.py
-    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/mountiso.py
-    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/startvm.py
-    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/stopvm.py
-    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/createdatadisk.py
-    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/deletedatadisk.py
-    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/setautostart.py
-    simple-vmcontrol_svc ALL=NOPASSWD: /usr/lib/simple-vmcontrol/sudo-scripts/shutdownvm.py
-
+    # If you plan on having Windows VMs, this ISO with drivers will be needed during Windows installation.
+    wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso
 
 ### KVM and Libvirt setup
 
 Install KVM and Libvirt:
 
     apt-get install qemu-kvm virtinst bridge-utils libvirt-clients libvirt-daemon-system qemu-utils --no-install-recommends
+
+Modify /etc/init.d/libvirt-guests
+
+    ON_BOOT=start
+    ON_SHUTDOWN=suspend
+
+If you want to relocate the directory containing save states (for example because /srv/ is a separate disk mount than the host OS root):
+
+    mv /var/lib/libvirt/ /srv/libvirt ; ln -s /srv/libvirt /var/lib/libvirt
+
+
+### Network setup
+
+#### Debian
+
+Find the name of your ethernet interface from the `ip link` command (for example `enp1s0`):
+
+Edit `/etc/network/interfaces`:
+
+```
+allow-hotplug enp1s0
+iface enp1s0 inet manual
+
+auto br0
+iface br0 inet dhcp
+        bridge_ports enp1s0
+```
+
+#### Ubuntu
 
 Find the name of your ethernet interface from the existing config file (for example enp1s0f0):
 
@@ -108,18 +134,6 @@ Set up libvirt to use this bridge (use whatever uuid it generated for you):
     virsh net-autostart default
     virsh net-list
 
-Create folder for VM disk images and relocated folder containing save states:
-
-    mkdir /srv/iso
-    cd /srv/iso
-    wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso
-    mkdir /srv/vm
-    mv /var/lib/libvirt/ /srv/libvirt ; ln -s /srv/libvirt /var/lib/libvirt
-
-Modify /etc/init.d/libvirt-guests
-
-    ON_BOOT=start
-    ON_SHUTDOWN=suspend
 
 
 License
