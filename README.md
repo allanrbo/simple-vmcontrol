@@ -56,7 +56,7 @@ Create directory for VM disk images and install images:
 
 Install KVM and Libvirt:
 
-    apt-get install qemu-kvm virtinst bridge-utils libvirt-clients libvirt-daemon-system qemu-utils --no-install-recommends
+    apt-get install qemu-kvm virtinst bridge-utils libvirt-clients libvirt-daemon-system qemu-utils ovmf --no-install-recommends
 
 Modify /etc/default/libvirt-guests
 
@@ -69,6 +69,10 @@ If you want to relocate the directory containing save states (for example becaus
 
 
 ### Network setup
+
+Set `bridge` in `config.json` to the network bridge used for new VMs.
+The examples below use `"bridge": "br0"`.
+When updating an existing installation, add this field before creating VMs.
 
 #### Debian
 

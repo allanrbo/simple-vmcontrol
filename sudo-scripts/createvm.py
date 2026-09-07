@@ -49,7 +49,7 @@ p = Popen([
     '-c', config['isolocation'] + installiso,
     '--boot=cdrom,hd',
     '--accelerate',
-    '--bridge=br0',
+    '--bridge=' + config['bridge'],
     '--connect=qemu:///system',
     '--video=vga',
     '--vnc',

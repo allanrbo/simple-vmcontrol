@@ -25,7 +25,11 @@ for d in os.listdir(configdir):
     # Read values from config file
     configXml = ET.parse(configdir + d)
     vm['memory'] = int(int(configXml.find('./memory').text) / 1024)
-    vm['cores'] = int(configXml.find('./cpu/topology').attrib['cores'])
+    topology = configXml.find('./cpu/topology')
+    if topology is None:
+        vm['cores'] = int(configXml.find('./vcpu').text)
+    else:
+        vm['cores'] = int(topology.attrib['cores'])
 
     vm['autostart'] = os.path.exists('/etc/libvirt/qemu/autostart/' + vmname + '.xml')
 
