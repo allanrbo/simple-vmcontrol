@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, check_output
 import json
 import os
 import os.path
@@ -29,6 +29,9 @@ if not os.path.isfile(config['isolocation'] + installiso):
     raise Exception('Install ISO not found')
 
 
+# Detect installer options before creating the disk image.
+virt_install_help = check_output(['/usr/bin/virt-install', '--help'])
+
 # Create the OS disk image
 p = Popen([
     '/usr/bin/qemu-img',
@@ -40,7 +43,7 @@ p = Popen([
 r = b'\n'.join(p.communicate())
 
 # Create the VM
-p = Popen([
+command = [
     '/usr/bin/virt-install',
     '-n', vmname,
     '-r', memory,
@@ -49,14 +52,16 @@ p = Popen([
     '-c', config['isolocation'] + installiso,
     '--boot=cdrom,hd',
     '--accelerate',
-    '--bridge=' + config['bridge'],
+    '--bridge=' + config.get('bridge', 'br0'),
     '--connect=qemu:///system',
     '--video=vga',
     '--vnc',
     '--noautoconsole',
-    '--osinfo', 'detect=on,require=off',
     '-v'
-    ], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    ]
+if b'--osinfo' in virt_install_help:
+    command.extend(['--osinfo', 'detect=on,require=off'])
+p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 r += b'\n'.join(p.communicate())
 
 print(r.decode('utf-8'))

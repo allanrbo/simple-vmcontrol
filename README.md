@@ -9,7 +9,8 @@ I wrote this quick and dirty system because it seemed the existing web UIs there
 
 Server setup
 ------------
-My VM host is a Debian 12 installation.
+The runtime supports Python 3.8 and newer. It uses `virt-install --osinfo` when
+the installed tool supports that option, and otherwise uses its existing defaults.
 
 ### Installation
 
@@ -71,8 +72,8 @@ If you want to relocate the directory containing save states (for example becaus
 ### Network setup
 
 Set `bridge` in `config.json` to the network bridge used for new VMs.
-The examples below use `"bridge": "br0"`.
-When updating an existing installation, add this field before creating VMs.
+The default is `br0` when this field is omitted. Set it explicitly for a different
+bridge, such as `"bridge": "lan-main"`.
 
 #### Debian
 
