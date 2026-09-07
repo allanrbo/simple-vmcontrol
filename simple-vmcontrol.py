@@ -437,10 +437,9 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
 
 try:
     server = http.server.HTTPServer(("0.0.0.0", config["port"]), MyHandler)
-    server.socket = ssl.wrap_socket(server.socket,
-        server_side=True,
-        certfile=config["cert_pem_path"],
-        ssl_version=ssl.PROTOCOL_TLS)
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain(config["cert_pem_path"])
+    server.socket = context.wrap_socket(server.socket, server_side=True)
     print("Started http server")
     server.serve_forever()
 except KeyboardInterrupt:
