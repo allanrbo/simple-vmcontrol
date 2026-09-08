@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
-from subprocess import Popen, PIPE
 import json
 import os
 import re
+import subprocess
 import sys
 
 config = {}
@@ -13,24 +13,22 @@ def reload_config():
 reload_config()
 
 vmname = sys.argv[1]
-if re.search('[^\w]', vmname):
+if re.search(r'[^\w]', vmname):
     raise Exception('Name can only be alphanumeric chars')
 
 
-# Stop the VM
-p = Popen(['/usr/bin/virsh', 'destroy', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r = b'\n'.join(p.communicate())
+# Stop the VM if it is active.
+running_vms = subprocess.check_output(['/usr/bin/virsh', 'list', '--name'], text=True)
+if vmname in running_vms.splitlines():
+    subprocess.run(['/usr/bin/virsh', 'destroy', vmname], check=True)
 
-# Delete the VM
-p = Popen(['/usr/bin/virsh', 'undefine', vmname], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-r += b'\n'.join(p.communicate())
+# Remove the definition before deleting its disks.
+subprocess.run(['/usr/bin/virsh', 'undefine', vmname], check=True)
 
 # Delete OS disk image
 os.remove(config['vmimagelocation'] + vmname + '.os.img')
 
 # Delete data disk images
 for filename in os.listdir(config['datadisklocation']):
-    if re.search(vmname +'.data\d+.img', filename):
+    if re.fullmatch(vmname + r'\.data\d+\.img', filename):
         os.remove(config['datadisklocation'] + filename)
-
-print(r.decode('utf-8'))
